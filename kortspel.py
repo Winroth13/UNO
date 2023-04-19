@@ -38,7 +38,7 @@ def displayCard(centerX, centerY, number, colour):
 def displayHand():
     for i in range(len(playerHand)):
         displayCard(windowWidth/2 - 50*(len(playerHand) - 1) + 100*i, windowHeight - cardHeight/2,
-                    str(playerHand[i][0]), colours[playerHand[i][1]], )
+                    str(playerHand[i][0]), colours[playerHand[i][1]])
 
 def randomCard():
     number = random.randint(0, 9)
