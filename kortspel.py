@@ -73,5 +73,10 @@ def start():
 
             if event.type == pygame.QUIT:
                 running = False
+            
+            if pygame.mouse.get_pressed() == (1,0,0):
+                if pygame.mouse.get_pos()[1] >= windowHeight - cardHeight:
+                    pygame.draw.rect(screen, (255, 255, 255), [0, windowHeight - cardHeight, 800, cardHeight])
+                    pygame.display.update()
 
 start()
