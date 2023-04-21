@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 def variables():
     global backgroundColour
@@ -47,6 +48,10 @@ def randomCard():
     
     return(number, colour)
 
+def middleCard(card):
+    displayCard(windowWidth/2, windowHeight/2, card[0], card[1])
+    pygame.display.update()
+
 def start():
     pygame.font.init()
     variables()
@@ -62,8 +67,8 @@ def start():
     
     displayHand()
     
-    middleCard = randomCard()
-    displayCard(windowWidth/2, windowHeight/2, middleCard[0], middleCard[1])
+    middleCard1 = randomCard()
+    displayCard(windowWidth/2, windowHeight/2, middleCard1[0], middleCard1[1])
     
     pygame.display.update()
     
@@ -75,8 +80,12 @@ def start():
                 running = False
             
             if pygame.mouse.get_pressed() == (1,0,0):
-                if pygame.mouse.get_pos()[1] >= windowHeight - cardHeight:
-                    pygame.draw.rect(screen, (255, 255, 255), [0, windowHeight - cardHeight, 800, cardHeight])
+                if pygame.mouse.get_pos()[1] >= windowHeight - cardHeight and pygame.mouse.get_pos()[0] >= (windowWidth - cardWidth*len(playerHand))/2 and pygame.mouse.get_pos()[0] <= (windowWidth + cardWidth*len(playerHand))/2:
+                    index = math.floor((pygame.mouse.get_pos()[0] - (windowWidth - cardWidth*len(playerHand))/2)/100)
+                    middleCard1 = playerHand[index]
+                    displayCard(windowWidth/2, windowHeight/2, middleCard1[0], middleCard1[1])
+                    playerHand.pop(index)
+                    displayHand()
                     pygame.display.update()
 
 start()
