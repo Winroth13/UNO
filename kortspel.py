@@ -18,7 +18,7 @@ def variables():
     windowWidth = 800
     windowHeight = 600
     windowName = 'UNO'
-    playerHand = [(0, 'Green'), (2, 'Yellow'), (9, 'Blue'), (8, 'Red')]
+    playerHand = []
     cardWidth = 100
     cardHeight = 150
     textFont = pygame.font.SysFont('monoscape', 100)
@@ -37,6 +37,8 @@ def displayCard(centerX, centerY, number, colour):
     screen.blit(smallNumber, (card.left + 2, card.top + 2))
 
 def displayHand():
+    pygame.draw.rect(screen, backgroundColour, [0, windowHeight - cardHeight, windowWidth, windowHeight])
+
     for i in range(len(playerHand)):
         displayCard(windowWidth/2 - 50*(len(playerHand) - 1) + 100*i, windowHeight - cardHeight/2,
                     str(playerHand[i][0]), colours[playerHand[i][1]])
@@ -52,6 +54,17 @@ def middleCard(card):
     displayCard(windowWidth/2, windowHeight/2, card[0], card[1])
     pygame.display.update()
 
+def drawCard(hand):
+    card = randomCard()
+
+    possibleCards = len(hand)
+    activeCard = math.celi(len(hand)/2)
+
+    #while card[0] != hand[activeCard] and possibleCards > 0:
+        
+
+    hand.append(card)
+
 def start():
     pygame.font.init()
     variables()
@@ -65,10 +78,12 @@ def start():
 
     running = True
     
+    for i in range(7):
+        drawCard(playerHand)
+
     displayHand()
     
-    middleCard1 = randomCard()
-    displayCard(windowWidth/2, windowHeight/2, middleCard1[0], middleCard1[1])
+    middleCard(randomCard())
     
     pygame.display.update()
     
@@ -82,8 +97,7 @@ def start():
             if pygame.mouse.get_pressed() == (1,0,0):
                 if pygame.mouse.get_pos()[1] >= windowHeight - cardHeight and pygame.mouse.get_pos()[0] >= (windowWidth - cardWidth*len(playerHand))/2 and pygame.mouse.get_pos()[0] <= (windowWidth + cardWidth*len(playerHand))/2:
                     index = math.floor((pygame.mouse.get_pos()[0] - (windowWidth - cardWidth*len(playerHand))/2)/100)
-                    middleCard1 = playerHand[index]
-                    displayCard(windowWidth/2, windowHeight/2, middleCard1[0], middleCard1[1])
+                    middleCard(playerHand[index])
                     playerHand.pop(index)
                     displayHand()
                     pygame.display.update()
