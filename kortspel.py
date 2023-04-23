@@ -10,9 +10,17 @@ def variables():
     global playerHand
     global cardWidth
     global cardHeight
-    global textFont
-    global smallTextFont
+    global largeNumberFont
+    global smallNumberFont
     global colours
+    global buttonWidth
+    global buttonHeight
+    global largeTextFont
+    global buttonColumnX
+    global buttonDrawY
+    global buttonUnoY
+    global smallTextFont
+    global coloursOnHand
 
     backgroundColour = (200, 200, 200)
     windowWidth = 800
@@ -21,26 +29,44 @@ def variables():
     playerHand = []
     cardWidth = 100
     cardHeight = 150
-    textFont = pygame.font.SysFont('monoscape', 100)
-    smallTextFont = pygame.font.SysFont('monoscape', 25)
+    largeNumberFont = pygame.font.SysFont('monoscape', 100)
+    smallNumberFont = pygame.font.SysFont('monoscape', 25)
+    
+    buttonWidth = 100
+    buttonHeight = 50
+    largeTextFont = pygame.font.SysFont('monoscape', 50)
+    smallTextFont = pygame.font.SysFont('monoscape', 40)
+    buttonColumnX = windowWidth*0.75
+    buttonDrawY  = windowHeight/2 - 30
+    buttonUnoY = windowHeight/2 + 30
+    
+    coloursOnHand = {'Red': 0, 'Green': 0, 'Blue': 0, 'Yellow': 0}
     
     colours = {'Red': (255, 0, 0), 'Green': (0, 255, 0), 'Blue': (0, 0, 255), 'Yellow': (255, 255, 0)}
 
 def displayCard(centerX, centerY, number, colour):
-    card = pygame.draw.rect(screen, colour, [centerX - cardWidth/2, centerY - cardHeight/2, cardWidth, cardHeight], width=0)
+    card = pygame.draw.rect(screen, colour, [centerX - cardWidth/2, centerY - cardHeight/2, cardWidth, cardHeight])
     pygame.draw.rect(screen, (0, 0, 0), [card.left, card.top, cardWidth, cardHeight], width=2)
     
-    largeNumber = textFont.render(str(number), 1, (0, 0, 0))
-    screen.blit(largeNumber, (card.centerx - 18, card.centery - 25))
+    largeNumber = largeNumberFont.render(str(number), 1, (0, 0, 0))
+    screen.blit(largeNumber, (centerX - 18, centerY - 25))
     
-    smallNumber = smallTextFont.render(str(number), 1, (0, 0, 0))
+    smallNumber = smallNumberFont.render(str(number), 1, (0, 0, 0))
     screen.blit(smallNumber, (card.left + 2, card.top + 2))
 
 def displayHand():
-    pygame.draw.rect(screen, backgroundColour, [0, windowHeight - cardHeight, windowWidth, windowHeight])
+    global cardDisplayWidth
+    cardShift = 0
+    
+    pygame.draw.rect(screen, backgroundColour, [0, windowHeight - cardHeight, windowWidth, cardHeight])
 
+    if cardWidth*len(playerHand) > windowWidth:
+        cardShift = (cardWidth*len(playerHand) - windowWidth)/len(playerHand)
+    
+    cardDisplayWidth = cardWidth - cardShift
+    
     for i in range(len(playerHand)):
-        displayCard(windowWidth/2 - 50*(len(playerHand) - 1) + 100*i, windowHeight - cardHeight/2,
+        displayCard(windowWidth/2 - 50*(len(playerHand) - 1) + cardShift/2*len(playerHand) + (100 - cardShift)*i, windowHeight - cardHeight/2,
                     str(playerHand[i][0]), colours[playerHand[i][1]])
 
 def randomCard():
@@ -50,20 +76,70 @@ def randomCard():
     
     return(number, colour)
 
-def middleCard(card):
+def displayMiddleCard(card):
+    global middleCard
+    
     displayCard(windowWidth/2, windowHeight/2, card[0], card[1])
     pygame.display.update()
+    middleCard = card
 
 def drawCard(hand):
     card = randomCard()
-
-    possibleCards = len(hand)
-    activeCard = math.celi(len(hand)/2)
-
-    #while card[0] != hand[activeCard] and possibleCards > 0:
+    
+    cardsInFront = 0
+    
+    colourIndex = list(coloursOnHand).index(card[1])
+    
+    for i in range(colourIndex):
+        cardsInFront += coloursOnHand[list(coloursOnHand)[i]]
+    
+    comparisonCards = coloursOnHand[list(coloursOnHand)[colourIndex]]
+    
+    coloursOnHand[list(coloursOnHand)[colourIndex]] += 1
+    
+    while True:
+        if comparisonCards == 0:
+            hand.insert(int(cardsInFront), card)
+            return
+        elif comparisonCards % 2 == 0:
+            comparisonCardIndex = int(cardsInFront + comparisonCards/2)
+            comparisonValue = (hand[comparisonCardIndex][0] + hand[comparisonCardIndex - 1][0])/2
+        else:
+            comparisonCardIndex = int(cardsInFront + math.floor(comparisonCards/2))
+            comparisonValue = hand[comparisonCardIndex][0]
+            comparisonCards -= 1
+            if comparisonValue < card[0]:
+                cardsInFront += 1
         
+        if comparisonValue == card[0]:
+            hand.insert(comparisonCardIndex, card)
+            return
+        elif comparisonValue > card[0]:
+            comparisonCards = comparisonCards/2
+        else:
+            comparisonCards = comparisonCards/2
+            cardsInFront += comparisonCards
 
-    hand.append(card)
+def drawButton(text, centerY, colour=(255, 255, 255)):
+    button = pygame.draw.rect(screen, colour, [ buttonColumnX - buttonWidth/2, 
+                                               centerY - buttonHeight/2, buttonWidth, buttonHeight])
+    pygame.draw.rect(screen, (0, 0, 0), [button.left, button.top, buttonWidth, buttonHeight], width=2)
+    
+    textString = largeTextFont.render(str(text), 1, (0, 0, 0))
+    screen.blit(textString, (buttonColumnX - 40, centerY - 15))
+
+def unoButton(pressed):
+    global unoButtonPressed
+    
+    if len(playerHand) == 1:
+        if pressed == True:
+            drawButton('UNO', buttonUnoY, colours['Green'])
+            unoButtonPressed = True
+        else:
+            drawButton('UNO', buttonUnoY, colours['Red'])
+            unoButtonPressed = False
+    else:
+        drawButton('UNO', buttonUnoY)
 
 def start():
     pygame.font.init()
@@ -78,12 +154,19 @@ def start():
 
     running = True
     
-    for i in range(7):
+    for i in range(6):
         drawCard(playerHand)
 
     displayHand()
     
-    middleCard(randomCard())
+    displayMiddleCard(randomCard())
+    
+    drawButton('Draw', buttonDrawY)
+    
+    drawButton('UNO', buttonUnoY)
+    
+    #smallText = smallTextFont.render('Cards:', 1, (0, 0, 0))
+    #screen.blit(smallText, (100, cardHeight - 5))
     
     pygame.display.update()
     
@@ -96,10 +179,36 @@ def start():
             
             if pygame.mouse.get_pressed() == (1,0,0):
                 if pygame.mouse.get_pos()[1] >= windowHeight - cardHeight and pygame.mouse.get_pos()[0] >= (windowWidth - cardWidth*len(playerHand))/2 and pygame.mouse.get_pos()[0] <= (windowWidth + cardWidth*len(playerHand))/2:
-                    index = math.floor((pygame.mouse.get_pos()[0] - (windowWidth - cardWidth*len(playerHand))/2)/100)
-                    middleCard(playerHand[index])
-                    playerHand.pop(index)
-                    displayHand()
-                    pygame.display.update()
+                    if len(playerHand)*cardWidth > windowWidth:
+                        index = math.floor(pygame.mouse.get_pos()[0]/cardDisplayWidth)
+                    else:
+                        index = math.floor((pygame.mouse.get_pos()[0] - 
+                                            (windowWidth - cardWidth*len(playerHand))/2)/cardWidth)
+                    
+                    if middleCard[0] == playerHand[index][0] or middleCard[1] == playerHand[index][1]:    
+                        displayMiddleCard(playerHand[index])
+                        playerHand.pop(index)
+                        
+                        if len(playerHand) == 0 and unoButtonPressed == False:
+                            for i in range(3):
+                                drawCard(playerHand)
+                        else:
+                            win = True
+                        
+                        displayHand()
+                    else:
+                        print('Nej')
+                    
+                    unoButton(False)
+
+                if pygame.mouse.get_pos()[0] >= buttonColumnX - buttonWidth/2 and pygame.mouse.get_pos()[0] <= buttonColumnX + buttonWidth/2:
+                    if pygame.mouse.get_pos()[1] >= buttonDrawY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonDrawY + buttonHeight/2:
+                        drawCard(playerHand)
+                        displayHand()
+                        pygame.display.update()
+                    elif pygame.mouse.get_pos()[1] >= buttonUnoY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonUnoY + buttonHeight/2:
+                        unoButton(True)
+                
+                pygame.display.update()
 
 start()
