@@ -21,12 +21,14 @@ def variables():
     global buttonUnoY
     global smallTextFont
     global coloursOnHand
+    global opponentHand
 
     backgroundColour = (200, 200, 200)
     windowWidth = 800
     windowHeight = 600
     windowName = 'UNO'
     playerHand = []
+    opponentHand = []
     cardWidth = 100
     cardHeight = 150
     largeNumberFont = pygame.font.SysFont('monoscape', 100)
@@ -44,15 +46,16 @@ def variables():
     
     colours = {'Red': (255, 0, 0), 'Green': (0, 255, 0), 'Blue': (0, 0, 255), 'Yellow': (255, 255, 0)}
 
-def displayCard(centerX, centerY, number, colour):
+def displayCard(centerX, centerY, number, colour, cornerNumber = True):
     card = pygame.draw.rect(screen, colour, [centerX - cardWidth/2, centerY - cardHeight/2, cardWidth, cardHeight])
     pygame.draw.rect(screen, (0, 0, 0), [card.left, card.top, cardWidth, cardHeight], width=2)
     
     largeNumber = largeNumberFont.render(str(number), 1, (0, 0, 0))
     screen.blit(largeNumber, (centerX - 18, centerY - 25))
     
-    smallNumber = smallNumberFont.render(str(number), 1, (0, 0, 0))
-    screen.blit(smallNumber, (card.left + 2, card.top + 2))
+    if cornerNumber == True:
+        smallNumber = smallNumberFont.render(str(number), 1, (0, 0, 0))
+        screen.blit(smallNumber, (card.left + 2, card.top + 2))
 
 def displayHand():
     global cardDisplayWidth
@@ -93,9 +96,9 @@ def drawCard(hand):
     for i in range(colourIndex):
         cardsInFront += coloursOnHand[list(coloursOnHand)[i]]
     
-    comparisonCards = coloursOnHand[list(coloursOnHand)[colourIndex]]
+    comparisonCards = coloursOnHand[card[1]]
     
-    coloursOnHand[list(coloursOnHand)[colourIndex]] += 1
+    coloursOnHand[card[1]] += 1
     
     while True:
         if comparisonCards == 0:
@@ -120,7 +123,7 @@ def drawCard(hand):
             comparisonCards = comparisonCards/2
             cardsInFront += comparisonCards
 
-def drawButton(text, centerY, colour=(255, 255, 255)):
+def drawButton(text, centerY, colour = (255, 255, 255)):
     button = pygame.draw.rect(screen, colour, [ buttonColumnX - buttonWidth/2, 
                                                centerY - buttonHeight/2, buttonWidth, buttonHeight])
     pygame.draw.rect(screen, (0, 0, 0), [button.left, button.top, buttonWidth, buttonHeight], width=2)
@@ -141,6 +144,14 @@ def unoButton(pressed):
     else:
         drawButton('UNO', buttonUnoY)
 
+def displayOpponentHand():
+    displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
+    
+    # if len(opponentHand) > 1:
+    #     displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
+    # else:
+    #     pass
+
 def start():
     pygame.font.init()
     variables()
@@ -154,8 +165,9 @@ def start():
 
     running = True
     
-    for i in range(6):
+    for i in range(1):
         drawCard(playerHand)
+        opponentHand.append(randomCard())
 
     displayHand()
     
@@ -164,9 +176,8 @@ def start():
     drawButton('Draw', buttonDrawY)
     
     drawButton('UNO', buttonUnoY)
-    
-    #smallText = smallTextFont.render('Cards:', 1, (0, 0, 0))
-    #screen.blit(smallText, (100, cardHeight - 5))
+
+    displayOpponentHand()
     
     pygame.display.update()
     
@@ -187,6 +198,7 @@ def start():
                     
                     if middleCard[0] == playerHand[index][0] or middleCard[1] == playerHand[index][1]:    
                         displayMiddleCard(playerHand[index])
+                        coloursOnHand[playerHand[index][1]] -= 1
                         playerHand.pop(index)
                         
                         if len(playerHand) == 0 and unoButtonPressed == False:
