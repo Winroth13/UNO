@@ -22,6 +22,8 @@ def variables():
     global smallTextFont
     global coloursOnHand
     global opponentHand
+    #global turnDisplayWidth
+    #global turnDisplayHeight
 
     backgroundColour = (200, 200, 200)
     windowWidth = 800
@@ -142,7 +144,7 @@ def unoButton(pressed):
             drawButton('UNO', buttonUnoY, colours['Red'])
             unoButtonPressed = False
     else:
-        drawButton('UNO', buttonUnoY)
+        drawButton('UNO', buttonUnoY, (125, 125, 125))
 
 def displayOpponentHand():
     displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
@@ -151,6 +153,23 @@ def displayOpponentHand():
     #     displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
     # else:
     #     pass
+
+#def opponentTurn():
+    #bestPlayIndex = none
+    #for i in opponentHand:
+        #if opponentHand(i)[0] == middleCard[0] or opponentHand(i)[1] == middleCard[1]:
+            #if bestPlayIndex == none or (Better in comparison):
+                #bestPlayIndex = i
+    #if bestPlayID != none:
+        #displayMiddleCard(opponentHand(bestPlayIndex))
+        #popponentHand.pop(bestPlayIndex)
+    #else:
+        #drawCard(opponentHand)
+
+#def turnDisplay(activePlayer):
+    #button = pygame.draw.rect(screen, colour, [ buttonColumnX - buttonWidth/2, 
+    #                                           centerY - buttonHeight/2, buttonWidth, buttonHeight])
+    #pygame.draw.rect(screen, (0, 0, 0), [button.left, button.top, buttonWidth, buttonHeight], width=2)
 
 def start():
     pygame.font.init()
@@ -165,7 +184,7 @@ def start():
 
     running = True
     
-    for i in range(1):
+    for i in range(3):
         drawCard(playerHand)
         opponentHand.append(randomCard())
 
@@ -175,7 +194,7 @@ def start():
     
     drawButton('Draw', buttonDrawY)
     
-    drawButton('UNO', buttonUnoY)
+    unoButton(False)
 
     displayOpponentHand()
     
