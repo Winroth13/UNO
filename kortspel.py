@@ -53,16 +53,19 @@ def variables():
     opponentColourPreferences = {'Red': 0, 'Green': 0, 'Blue': 0, 'Yellow': 0}
     opponentNumberPreferences = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
 
+def drawFrame(centerX, centerY, width, height, colour = (255, 255, 255)):
+    frame = pygame.draw.rect(screen, colour, [centerX - width/2, centerY - height/2, width, height])
+    pygame.draw.rect(screen, (0, 0, 0), [frame.left, frame.top, width, height], width=2)
+
 def displayCard(centerX, centerY, number, colour, cornerNumber = True):
-    card = pygame.draw.rect(screen, colour, [centerX - cardWidth/2, centerY - cardHeight/2, cardWidth, cardHeight])
-    pygame.draw.rect(screen, (0, 0, 0), [card.left, card.top, cardWidth, cardHeight], width=2)
+    drawFrame(centerX, centerY, cardWidth, cardHeight, colour)
     
     largeNumber = largeNumberFont.render(str(number), 1, (0, 0, 0))
     screen.blit(largeNumber, (centerX - 18, centerY - 25))
     
     if cornerNumber == True:
         smallNumber = smallNumberFont.render(str(number), 1, (0, 0, 0))
-        screen.blit(smallNumber, (card.left + 2, card.top + 2))
+        screen.blit(smallNumber, (centerX - cardWidth/2 + 2, centerY - cardHeight/2 + 2))
 
 def displayHand():
     global cardDisplayWidth
@@ -161,10 +164,15 @@ def unoButton(pressed):
 def displayOpponentHand():
     displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
     
-    # if len(opponentHand) > 1:
+    # if len(opponentHand) == 0:
+    #     loss = True
+    # elif len(opponentHand) == 1:
+    #     Disprlay one number and UNO
     #     displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
+    # elif len(opponentHand) > 9:
+    #     Display two numbers
     # else:
-    #     pass
+    #     Display on number
 
 def opponentTurn():
     #print(opponentColourPreferences)
