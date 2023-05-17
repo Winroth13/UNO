@@ -17,6 +17,8 @@ def variables():
     global buttonHeight
     global largeTextFont
     global buttonColumnX
+    global buttonLeaderboardY
+    global buttonRulesY
     global buttonDrawY
     global buttonUnoY
     global smallTextFont
@@ -43,8 +45,10 @@ def variables():
     largeTextFont = pygame.font.SysFont('monoscape', 50)
     smallTextFont = pygame.font.SysFont('monoscape', 40)
     buttonColumnX = windowWidth*0.75
-    buttonDrawY  = windowHeight/2 - 30
-    buttonUnoY = windowHeight/2 + 30
+    buttonLeaderboardY = windowHeight/2 - 90
+    buttonRulesY = windowHeight/2 - 30
+    buttonDrawY  = windowHeight/2 + 30
+    buttonUnoY = windowHeight/2 + 90
     
     coloursOnHand = {'Red': 0, 'Green': 0, 'Blue': 0, 'Yellow': 0}
     
@@ -140,39 +144,47 @@ def opponentDrawCard():
     opponentColourPreferences[card[1]] += 1
     opponentNumberPreferences[card[0]] += 1
 
-def drawButton(text, centerY, colour = (255, 255, 255)):
-    button = pygame.draw.rect(screen, colour, [ buttonColumnX - buttonWidth/2, 
-                                               centerY - buttonHeight/2, buttonWidth, buttonHeight])
-    pygame.draw.rect(screen, (0, 0, 0), [button.left, button.top, buttonWidth, buttonHeight], width=2)
-    
+def drawSmallButton(text, centerY, colour = (255, 255, 255)):
+    drawFrame(buttonColumnX, centerY, buttonWidth, buttonHeight, colour)
+
     textString = largeTextFont.render(str(text), 1, (0, 0, 0))
-    screen.blit(textString, (buttonColumnX - 40, centerY - 15))
+    screen.blit(textString, (buttonColumnX - 20 - 5.5*len(text), centerY - 15))
+
+def drawLargeButton(text, centerY, colour = (255, 255, 255)):
+    # drawFrame(buttonColumnX, centerY, buttonWidth, buttonHeight, colour)
+
+    # textString = largeTextFont.render(str(text), 1, (0, 0, 0))
+    # screen.blit(textString, (buttonColumnX - 20 - 5.5*len(text), centerY - 15))
+    pass
 
 def unoButton(pressed):
     global unoButtonPressed
     
     if len(playerHand) == 1:
         if pressed == True:
-            drawButton('UNO', buttonUnoY, colours['Green'])
+            drawSmallButton('UNO', buttonUnoY, colours['Green'])
             unoButtonPressed = True
         else:
-            drawButton('UNO', buttonUnoY, colours['Red'])
+            drawSmallButton('UNO', buttonUnoY, colours['Red'])
             unoButtonPressed = False
     else:
-        drawButton('UNO', buttonUnoY, (125, 125, 125))
+        drawSmallButton('UNO', buttonUnoY, (125, 125, 125))
 
 def displayOpponentHand():
-    displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
-    
-    # if len(opponentHand) == 0:
-    #     loss = True
-    # elif len(opponentHand) == 1:
-    #     Disprlay one number and UNO
-    #     displayCard(windowWidth/2, cardHeight/2, len(opponentHand), (255, 255, 255), False)
-    # elif len(opponentHand) > 9:
-    #     Display two numbers
-    # else:
-    #     Display on number
+    drawFrame(windowWidth/2, cardHeight/2, cardWidth, cardHeight)
+
+    number = largeNumberFont.render(str(len(opponentHand)), 1, (0, 0, 0))
+
+    if len(opponentHand) == 0:
+        loss = True
+    elif len(opponentHand) > 9:
+        screen.blit(number, (windowWidth/2 - 38, cardHeight/2 - 25))
+    else:
+        screen.blit(number, (windowWidth/2 - 18, cardHeight/2 - 25))
+
+        if len(opponentHand) == 1:
+            pass
+            # Dispay UNO
 
 def opponentTurn():
     #print(opponentColourPreferences)
@@ -245,9 +257,10 @@ def start():
     displayHand()
     
     displayMiddleCard(randomCard())
-    
-    drawButton('Draw', buttonDrawY)
-    
+
+    drawLargeButton('Leaderboard', buttonLeaderboardY)
+    drawSmallButton('Rules', buttonRulesY)
+    drawSmallButton('Draw', buttonDrawY)
     unoButton(False)
 
     displayOpponentHand()
