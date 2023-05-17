@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import time
 
 def variables():
     global backgroundColour
@@ -14,6 +15,7 @@ def variables():
     global smallNumberFont
     global colours
     global buttonWidth
+    global largeButtonWidth
     global buttonHeight
     global largeTextFont
     global buttonColumnX
@@ -26,8 +28,10 @@ def variables():
     global opponentHand
     global opponentColourPreferences
     global opponentNumberPreferences
-    #global turnDisplayWidth
-    #global turnDisplayHeight
+    global turnDisplayWidth
+    global turnDisplayHeight
+    global turnDisplayX
+    global turnDisplayY
 
     backgroundColour = (200, 200, 200)
     windowWidth = 800
@@ -41,6 +45,7 @@ def variables():
     smallNumberFont = pygame.font.SysFont('monoscape', 25)
     
     buttonWidth = 100
+    largeButtonWidth = buttonWidth*2.5
     buttonHeight = 50
     largeTextFont = pygame.font.SysFont('monoscape', 50)
     smallTextFont = pygame.font.SysFont('monoscape', 40)
@@ -49,6 +54,11 @@ def variables():
     buttonRulesY = windowHeight/2 - 30
     buttonDrawY  = windowHeight/2 + 30
     buttonUnoY = windowHeight/2 + 90
+
+    turnDisplayWidth = 300
+    turnDisplayHeight = 50
+    turnDisplayX = windowWidth/5
+    turnDisplayY = windowHeight/2
     
     coloursOnHand = {'Red': 0, 'Green': 0, 'Blue': 0, 'Yellow': 0}
     
@@ -60,6 +70,10 @@ def variables():
 def drawFrame(centerX, centerY, width, height, colour = (255, 255, 255)):
     frame = pygame.draw.rect(screen, colour, [centerX - width/2, centerY - height/2, width, height])
     pygame.draw.rect(screen, (0, 0, 0), [frame.left, frame.top, width, height], width=2)
+
+def writeText(text, leftX, topY):
+    textString = largeTextFont.render(str(text), 1, (0, 0, 0))
+    screen.blit(textString, (leftX, topY))
 
 def displayCard(centerX, centerY, number, colour, cornerNumber = True):
     drawFrame(centerX, centerY, cardWidth, cardHeight, colour)
@@ -147,15 +161,12 @@ def opponentDrawCard():
 def drawSmallButton(text, centerY, colour = (255, 255, 255)):
     drawFrame(buttonColumnX, centerY, buttonWidth, buttonHeight, colour)
 
-    textString = largeTextFont.render(str(text), 1, (0, 0, 0))
-    screen.blit(textString, (buttonColumnX - 20 - 5.5*len(text), centerY - 15))
+    writeText(text, buttonColumnX - 20 - 5.5*len(text), centerY - 15)
 
 def drawLargeButton(text, centerY, colour = (255, 255, 255)):
-    # drawFrame(buttonColumnX, centerY, buttonWidth, buttonHeight, colour)
+    drawFrame(buttonColumnX, centerY, largeButtonWidth, buttonHeight, colour)
 
-    # textString = largeTextFont.render(str(text), 1, (0, 0, 0))
-    # screen.blit(textString, (buttonColumnX - 20 - 5.5*len(text), centerY - 15))
-    pass
+    writeText(text, buttonColumnX - 110, centerY - 15)
 
 def unoButton(pressed):
     global unoButtonPressed
@@ -180,13 +191,17 @@ def displayOpponentHand():
     elif len(opponentHand) > 9:
         screen.blit(number, (windowWidth/2 - 38, cardHeight/2 - 25))
     else:
-        screen.blit(number, (windowWidth/2 - 18, cardHeight/2 - 25))
-
         if len(opponentHand) == 1:
-            pass
-            # Dispay UNO
+            writeText('UNO!', windowWidth/2 - 44, cardHeight/2 - 10)
+        
+        else:
+            screen.blit(number, (windowWidth/2 - 18, cardHeight/2 - 25))
 
 def opponentTurn():
+    isPlayerTurn(False)
+    pygame.display.update()
+    time.sleep(1)
+
     #print(opponentColourPreferences)
     #print(opponentNumberPreferences)
     #print('Opponent Turn')
@@ -230,33 +245,26 @@ def opponentTurn():
     
     displayOpponentHand()
 
-#def turnDisplay(activePlayer):
-    #button = pygame.draw.rect(screen, colour, [ buttonColumnX - buttonWidth/2, 
-    #                                           centerY - buttonHeight/2, buttonWidth, buttonHeight])
-    #pygame.draw.rect(screen, (0, 0, 0), [button.left, button.top, buttonWidth, buttonHeight], width=2)
+    isPlayerTurn(True)
 
-def start():
-    pygame.font.init()
-    variables()
-    global screen
+def isPlayerTurn(playerTurn):
+    if playerTurn == True:
+        drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, colours['Green'])
+        writeText('Your turn', turnDisplayX - 80, turnDisplayY - 15)
+    else:
+        drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, colours['Red'])
+        writeText("Opponent's turn", turnDisplayX - 135, turnDisplayY - 15)
+
+def playArea():
     global opponentColourPreferences
     global opponentNumberPreferences
+    global running
 
-    screen = pygame.display.set_mode((windowWidth, windowHeight))
-    pygame.display.set_caption(windowName)
     screen.fill(backgroundColour)
 
-    pygame.display.flip()
-
-    running = True
-    
-    for i in range(3):
-        playerDrawCard()
-        opponentDrawCard()
+    displayMiddleCard(middleCard)
 
     displayHand()
-    
-    displayMiddleCard(randomCard())
 
     drawLargeButton('Leaderboard', buttonLeaderboardY)
     drawSmallButton('Rules', buttonRulesY)
@@ -264,6 +272,8 @@ def start():
     unoButton(False)
 
     displayOpponentHand()
+
+    isPlayerTurn(True)
     
     pygame.display.update()
     
@@ -329,7 +339,43 @@ def start():
                         opponentTurn()
                     elif pygame.mouse.get_pos()[1] >= buttonUnoY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonUnoY + buttonHeight/2:
                         unoButton(True)
+                    
+                    elif pygame.mouse.get_pos()[1] >= buttonRulesY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonRulesY + buttonHeight/2:
+                        #displayRules()
+                        print('Rules')
                 
+                if pygame.mouse.get_pos()[0] >= buttonColumnX - largeButtonWidth/2 and pygame.mouse.get_pos()[0] <= buttonColumnX + largeButtonWidth/2 and pygame.mouse.get_pos()[1] >= buttonLeaderboardY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonLeaderboardY + buttonHeight/2:
+                    #displayLeaderboard()
+                    print('Leaderboard')
+
                 pygame.display.update()
+
+def newGame():
+    variables()
+    global middleCard
+
+    for i in range(3):
+        playerDrawCard()
+        opponentDrawCard()
+
+    middleCard = randomCard()
+
+    playArea()
+
+def start():
+    pygame.font.init()
+    variables()
+    global screen
+    global running
+
+    screen = pygame.display.set_mode((windowWidth, windowHeight))
+    pygame.display.set_caption(windowName)
+    screen.fill(backgroundColour)
+
+    pygame.display.flip()
+
+    running = True
+    
+    newGame()
 
 start()
