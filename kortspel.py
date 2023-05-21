@@ -459,6 +459,140 @@ def endOfGame(outcome):
     #Button to restart
     drawSmallButton("Restart", windowWidth/2, buttonReturnY)
 
+def playAreaInteractions():
+    #All interaction in the play area
+    global opponentColourPreferences
+    global opponentNumberPreferences
+    
+    #Clicked in player hand area
+    if pygame.mouse.get_pos()[1] >= windowHeight - cardHeight and pygame.mouse.get_pos()[0] >= (windowWidth - cardWidth*len(playerHand))/2 and pygame.mouse.get_pos()[0] <= (windowWidth + cardWidth*len(playerHand))/2:
+        #Checks if a card was clickerd on
+        #If the cards are compressed on screen
+        if len(playerHand)*cardWidth > windowWidth:
+            index = math.floor(pygame.mouse.get_pos()[0]/cardDisplayWidth)
+        #If the cards aren't compressed on screen
+        else:
+            index = math.floor((pygame.mouse.get_pos()[0] - 
+                                (windowWidth - cardWidth*len(playerHand))/2)/cardWidth)
+        
+        #Clicked on unplayable card
+        if middleCard[0] != playerHand[index][0] and middleCard[1] != playerHand[index][1]:
+            #Tells the player that the card is unplayable
+            writeText("Unplayable card", windowWidth/2 - 80, windowHeight - cardHeight - 40, True)
+            
+            #Interaction ends immediately
+            return
+        
+        #Sets the middle card to the newly played card
+        displayMiddleCard(playerHand[index])
+        
+        #Removes the played card from the number of cards of each colour
+        coloursOnHand[playerHand[index][1]] -= 1
+        
+        #Makes the opponent less likely to play cards that have a higher cahnce of being good for the player
+        opponentColourPreferences[playerHand[index][1]] -= 0.5
+        opponentNumberPreferences[playerHand[index][0]] -= 0.5
+        
+        #Remove card from player hand
+        playerHand.pop(index)
+        
+        #Played last card
+        if len(playerHand) == 0:
+            #UNO button not pressed
+            if unoButtonPressed == True:
+                #Victory screen is drawn
+                endOfGame("Win")
+                
+                #Interaction ends immediately
+                return
+            
+            #The player draws three cards
+            for i in range(3):
+                playerDrawCard()
+                
+            #Reset all preference scores, since the player gets a fresh hand
+            opponentColourPreferences = {'Red': 0, 'Green': 0, 'Blue': 0, 'Yellow': 0}
+            opponentNumberPreferences = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+            
+            #They still need to account for their own cards on hand
+            for opponentCard in opponentHand:
+                opponentColourPreferences[opponentCard[1]] += 1
+                opponentNumberPreferences[opponentCard[0]] += 1
+        
+        #The new player hand is drawn
+        displayHand()
+        
+        #Resets the UNO button
+        unoButton(False)
+        
+        #Opponent's turn
+        opponentTurn()
+
+    #Button column in playArea
+    if pygame.mouse.get_pos()[0] >= buttonColumnX - smallButtonWidth/2 and pygame.mouse.get_pos()[0] <= buttonColumnX + smallButtonWidth/2:
+        #Draw card button
+        if pygame.mouse.get_pos()[1] >= buttonDrawY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonDrawY + buttonHeight/2:
+            #Player draws a card and tehir new hand is drawn
+            playerDrawCard()
+            displayHand()
+            
+            #More likely to play cards the player cannot play on
+            opponentColourPreferences[middleCard[1]] += 1
+            opponentNumberPreferences[middleCard[0]] += 1
+            
+            #Resets the UNO button
+            unoButton(False)
+            
+            #Opponent's turn
+            opponentTurn()
+        
+        #UNO button
+        elif pygame.mouse.get_pos()[1] >= buttonUnoY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonUnoY + buttonHeight/2:
+            #The UNO button is triggered
+            unoButton(True)
+        
+        #Rules gutton
+        elif pygame.mouse.get_pos()[1] >= buttonRulesY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonRulesY + buttonHeight/2:
+            #Shows the rules window
+            infoWindow("Rules")
+    
+    #Leaderboard button
+    if pygame.mouse.get_pos()[0] >= buttonColumnX - largeButtonWidth/2 and pygame.mouse.get_pos()[0] <= buttonColumnX + largeButtonWidth/2 and pygame.mouse.get_pos()[1] >= buttonLeaderboardY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonLeaderboardY + buttonHeight/2:
+        #Shows the leaderboard window
+        infoWindow("Leaderboard")
+
+def interactions():
+    #Everything that can be intereacted with in the game
+    global running
+    global currentWindow
+    
+    while running:
+
+        for event in pygame.event.get():
+
+            #If the application is closed
+            if event.type == pygame.QUIT:
+                running = False
+            
+            if pygame.mouse.get_pressed() == (1,0,0):
+                #All interactions in the main play area
+                if currentWindow == "playArea":
+                    playAreaInteractions()
+                
+                #Back button in infoWindow
+                elif currentWindow == "infoWindow":
+                    if pygame.mouse.get_pos()[0] >= windowWidth/2 - smallButtonWidth/2 and pygame.mouse.get_pos()[0] <= windowWidth/2 + smallButtonWidth/2 and pygame.mouse.get_pos()[1] >= buttonReturnY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonReturnY + buttonHeight/2:
+                        #Returns to play area
+                        playArea()
+                
+                #Restart button in endOfGame window
+                else:
+                    if pygame.mouse.get_pos()[0] >= windowWidth/2 - smallButtonWidth/2 and pygame.mouse.get_pos()[0] <= windowWidth/2 + smallButtonWidth/2 and pygame.mouse.get_pos()[1] >= buttonReturnY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonReturnY + buttonHeight/2:
+                        #Starts a new game
+                        newGame()
+
+                pygame.display.update()
+
 def playArea():
     #The play area is deawn
     global opponentColourPreferences
@@ -536,132 +670,5 @@ def start():
     running = True
     
     newGame()
-
-def interactions():
-    #Everything that can be intereacted with in the game
-    global running
-    global opponentColourPreferences
-    global opponentNumberPreferences
-    global currentWindow
-    
-    while running:
-
-        for event in pygame.event.get():
-
-            #If the application is closed
-            if event.type == pygame.QUIT:
-                running = False
-            
-            if pygame.mouse.get_pressed() == (1,0,0):
-                if currentWindow == "playArea":
-                    #Clicked in player hand area
-                    if pygame.mouse.get_pos()[1] >= windowHeight - cardHeight and pygame.mouse.get_pos()[0] >= (windowWidth - cardWidth*len(playerHand))/2 and pygame.mouse.get_pos()[0] <= (windowWidth + cardWidth*len(playerHand))/2:
-                        #Checks if a card was clickerd on
-                        #If the cards are compressed on screen
-                        if len(playerHand)*cardWidth > windowWidth:
-                            index = math.floor(pygame.mouse.get_pos()[0]/cardDisplayWidth)
-                        #If the cards aren't compressed on screen
-                        else:
-                            index = math.floor((pygame.mouse.get_pos()[0] - 
-                                                (windowWidth - cardWidth*len(playerHand))/2)/cardWidth)
-                        
-                        #Clicked on playable card
-                        if middleCard[0] == playerHand[index][0] or middleCard[1] == playerHand[index][1]:    
-                            displayMiddleCard(playerHand[index])
-                            coloursOnHand[playerHand[index][1]] -= 1
-                            
-                            #Makes the opponent less likely to play cards that have a higher cahnce of being good for the player
-                            opponentColourPreferences[playerHand[index][1]] -= 0.5
-                            opponentNumberPreferences[playerHand[index][0]] -= 0.5
-                            
-                            #Remove card from player hand
-                            playerHand.pop(index)
-                            
-                            #Played last card
-                            if len(playerHand) == 0:
-                                #UNO button not pressed
-                                if unoButtonPressed == False:
-                                    #The player draws three cards
-                                    for i in range(3):
-                                        playerDrawCard()
-                                        
-                                        #Reset all preference scores, since the player gets a fresh hand
-                                        opponentColourPreferences = {'Red': 0, 'Green': 0, 'Blue': 0, 'Yellow': 0}
-                                        opponentNumberPreferences = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
-                                        
-                                        #They still need to account for their own cards on hand
-                                        for opponentCard in opponentHand:
-                                            opponentColourPreferences[opponentCard[1]] += 1
-                                            opponentNumberPreferences[opponentCard[0]] += 1
-                                
-                                #UNO button pressed
-                                else:
-                                    #Wictory screen is drawn
-                                    endOfGame("Win")
-                                    pygame.display.update()
-                                    
-                                    #The round stops immediately
-                                    break
-                            
-                            #The new player hand is drawn
-                            displayHand()
-                            
-                            #Resets the UNO button
-                            unoButton(False)
-                            
-                            #Opponent's turn
-                            opponentTurn()
-                        
-                        #Unplayable card
-                        else:
-                            #Tellls the player than they cannot play that card
-                            writeText("Unplayable card", windowWidth/2 - 80, windowHeight - cardHeight - 40, True)
-
-                    #Button column in playArea
-                    if pygame.mouse.get_pos()[0] >= buttonColumnX - smallButtonWidth/2 and pygame.mouse.get_pos()[0] <= buttonColumnX + smallButtonWidth/2:
-                        #Draw card button
-                        if pygame.mouse.get_pos()[1] >= buttonDrawY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonDrawY + buttonHeight/2:
-                            #Player draws a card and tehir new hand is drawn
-                            playerDrawCard()
-                            displayHand()
-                            
-                            #More likely to play cards the player cannot play on
-                            opponentColourPreferences[middleCard[1]] += 1
-                            opponentNumberPreferences[middleCard[0]] += 1
-                            
-                            #Resets the UNO button
-                            unoButton(False)
-                            
-                            #Opponent's turn
-                            opponentTurn()
-                        
-                        #UNO button
-                        elif pygame.mouse.get_pos()[1] >= buttonUnoY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonUnoY + buttonHeight/2:
-                            #The UNO button is triggered
-                            unoButton(True)
-                        
-                        #Rules gutton
-                        elif pygame.mouse.get_pos()[1] >= buttonRulesY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonRulesY + buttonHeight/2:
-                            #Shows the rules window
-                            infoWindow("Rules")
-                    
-                    #Leaderboard button
-                    if pygame.mouse.get_pos()[0] >= buttonColumnX - largeButtonWidth/2 and pygame.mouse.get_pos()[0] <= buttonColumnX + largeButtonWidth/2 and pygame.mouse.get_pos()[1] >= buttonLeaderboardY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonLeaderboardY + buttonHeight/2:
-                        #Shows the leaderboard window
-                        infoWindow("Leaderboard")
-                
-                #Back button in infoWindow
-                elif currentWindow == "infoWindow":
-                    if pygame.mouse.get_pos()[0] >= windowWidth/2 - smallButtonWidth/2 and pygame.mouse.get_pos()[0] <= windowWidth/2 + smallButtonWidth/2 and pygame.mouse.get_pos()[1] >= buttonReturnY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonReturnY + buttonHeight/2:
-                        #Returns to play area
-                        playArea()
-                
-                #Restart button in endOfGame window
-                else:
-                    if pygame.mouse.get_pos()[0] >= windowWidth/2 - smallButtonWidth/2 and pygame.mouse.get_pos()[0] <= windowWidth/2 + smallButtonWidth/2 and pygame.mouse.get_pos()[1] >= buttonReturnY - buttonHeight/2 and pygame.mouse.get_pos()[1] <= buttonReturnY + buttonHeight/2:
-                        #Starts a new game
-                        newGame()
-
-                pygame.display.update()
 
 start()
