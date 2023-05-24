@@ -134,7 +134,7 @@ def objectInserter(object, list, comparisonObjects, isLeaderboard, objectsInFron
         if comparisonValue == object[0]:
             #Needs to put the object behind all objects of the same value if it is the leaderboard
             if isLeaderboard == True:
-                #MMoves the object one step back if the objectr behind it has the same value
+                #Moves the object one step back if the objectr behind it has the same value
                 #This step is done one object at a time since it is faster due to the fact that there
                 #   will only be a few entires that fulfill the requirement
                 while list[comparisonObjectIndex][0] == object[0]:
