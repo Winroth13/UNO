@@ -95,7 +95,7 @@ def variables():
     playerRanking = "-"
     playerScore = "--"
 
-def objectInserter(object, list, comparisonObjects, objectsInFront = 0):
+def objectInserter(object, list, comparisonObjects, isLeaderboard, objectsInFront = 0):
     #Inserts an opject into a list
     #Lower numbers are inserted earlier in the list
     while True:
@@ -132,11 +132,19 @@ def objectInserter(object, list, comparisonObjects, objectsInFront = 0):
         
         #If the Object has the same value as the comaprison value
         if comparisonValue == object[0]:
-            #This will insert the object after the one it was comapred to
-            list.insert(comparisonObjectIndex + 1, object)
+            #Needs to put the object behind all objects of the same value if it is the leaderboard
+            if isLeaderboard == True:
+                #MMoves the object one step back if the objectr behind it has the same value
+                #This step is done one object at a time since it is faster due to the fact that there
+                #   will only be a few entires that fulfill the requirement
+                while list[comparisonObjectIndex][0] == object[0]:
+                    comparisonObjectIndex += 1
+                
+                #The objects index is returned so it can be used while displaying the leaderboard
+                return(comparisonObjectIndex)
             
-            #The objects index is returned in case it is to be used when displaying the leaderboard
-            return(comparisonObjectIndex + 1)
+            #This will insert the object after the one it was comapred to
+            list.insert(comparisonObjectIndex, object)
         
         #If the object has a lover value than the one it aws compared to
         elif comparisonValue > object[0]:
@@ -244,7 +252,7 @@ def playerDrawCard():
     coloursOnHand[card[1]] += 1
     
     #The card is inserted into the right index in the player's hand
-    objectInserter(card, playerHand, comparisonCards, cardsInFront)
+    objectInserter(card, playerHand, comparisonCards, False, cardsInFront)
 
 def opponentDrawCard():
     #The opponent is given a random card
@@ -444,7 +452,7 @@ def endOfGame(outcome):
         
         playerScore = turnCounter - len(opponentHand)
         player = (playerScore, playerName)
-        playerRanking = objectInserter(player, leaderboard, len(leaderboard)) + 1
+        playerRanking = objectInserter(player, leaderboard, len(leaderboard), True) + 1
         
         #The new leaderboard is saved to the "leaderboard"-file
         with open("leaderboard.txt", "wb") as filehandle:
