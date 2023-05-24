@@ -139,12 +139,12 @@ def objectInserter(object, list, comparisonObjects, isLeaderboard, objectsInFron
                 #   will only be a few entires that fulfill the requirement
                 while list[comparisonObjectIndex][0] == object[0]:
                     comparisonObjectIndex += 1
-                
-                #The objects index is returned so it can be used while displaying the leaderboard
-                return(comparisonObjectIndex)
             
             #This will insert the object after the one it was comapred to
             list.insert(comparisonObjectIndex, object)
+
+            #The objects index is returned in case it is to be used when displaying the leaderboard
+            return(comparisonObjectIndex)
         
         #If the object has a lover value than the one it aws compared to
         elif comparisonValue > object[0]:
@@ -452,7 +452,7 @@ def endOfGame(outcome):
         
         playerScore = turnCounter - len(opponentHand)
         player = (playerScore, playerName)
-        playerRanking = objectInserter(player, leaderboard, len(leaderboard), True) + 1
+        playerRanking = int(objectInserter(player, leaderboard, len(leaderboard), True) + 1)
         
         #The new leaderboard is saved to the "leaderboard"-file
         with open("leaderboard.txt", "wb") as filehandle:
@@ -657,7 +657,7 @@ def start():
     #The saved leaderboard is loaded in from the "leaderboard"-file
     with open("leaderboard.txt", "rb") as filehandle:
         leaderboard = pickle.load(filehandle)
-    
+
     #This can be used to check the leaderboard
     # print(leaderboard)
     
