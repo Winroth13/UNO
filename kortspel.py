@@ -322,13 +322,14 @@ def isPlayerTurn(playerTurn):
         drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, cardColours['Green'])
         writeText('Your turn', turnDisplayX - 80, turnDisplayY - 15)
         
-        #Advances the turn by one
-        turnCounter += 1
-        
     #If it's the oppoenent's turn
     else:
         drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, cardColours['Red'])
         writeText("Opponent's turn", turnDisplayX - 135, turnDisplayY - 15)
+        
+        #Advances the turn by one
+        #It is placed here, since playerTurn == True is also called upon refreshing the play area
+        turnCounter += 1
 
 def opponentTurn():
     #The turn display is updated
