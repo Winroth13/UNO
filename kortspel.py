@@ -287,7 +287,7 @@ def unoButton(pressed):
         if pressed == True:
             drawSmallButton('UNO', buttonColumnX, buttonUnoY, cardColours['Green'])
             
-            #This variable is checked when the player plays tehir last card
+            #This variable is checked when the player plays their last card
             unoButtonPressed = True
         #If the button hasn't been pressed
         else:
