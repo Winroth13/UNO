@@ -478,6 +478,8 @@ def playAreaInteractions():
         if len(playerHand)*cardWidth > windowWidth:
             index = math.floor(pygame.mouse.get_pos()[0]/cardDisplayWidth)
         #If the cards aren't compressed on screen
+        #This takes mouseX, subtracts the area to the left of the cards (so you get the mouseX relative to 
+        # the left side of the leftmost card) and divides the result by the width of the cards
         else:
             index = math.floor((pygame.mouse.get_pos()[0] - 
                                 (windowWidth - cardWidth*len(playerHand))/2)/cardWidth)
