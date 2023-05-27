@@ -383,6 +383,24 @@ def opponentTurn():
     else:
         isPlayerTurn(True)
 
+def leaderboardEntry(ranking, name, score, topY):
+    #How entries in the leaderboard are displayed
+    writeText(ranking, windowWidth/2 - 80, topY, True)
+    writeText(name, windowWidth/2 - 50, topY, True)
+    writeText(score, windowWidth/2 + 60, topY, True)
+
+def displayLeaderboard():
+    #Shows a fitting header
+    writeText("Leaderboard", windowWidth/2 - 110, windowHeight/6)
+    
+    #Shows the five top entires on the leaderboard
+    for i in range(5):
+        leaderboardEntry(i + 1, leaderboard[i][1], leaderboard[i][0], windowHeight/3 + 30*(i - 1))
+    
+    #Shows your position on the leaderboard
+    writeText("Your score:", windowWidth*0.5 - 55, windowHeight*0.6 - 30, True)
+    leaderboardEntry(playerRanking, playerName, playerScore, windowHeight*0.6)
+
 def infoWindow(windowName):
     global currentWindow
     
@@ -414,24 +432,6 @@ def infoWindow(windowName):
     
     #The "Back"-button that returns you to the play area
     drawSmallButton("Back", windowWidth/2, buttonReturnY)
-
-def leaderboardEntry(ranking, name, score, topY):
-    #How entries in the leaderboard are displayed
-    writeText(ranking, windowWidth/2 - 80, topY, True)
-    writeText(name, windowWidth/2 - 50, topY, True)
-    writeText(score, windowWidth/2 + 60, topY, True)
-
-def displayLeaderboard():
-    #Shows a fitting header
-    writeText("Leaderboard", windowWidth/2 - 110, windowHeight/6)
-    
-    #Shows the five top entires on the leaderboard
-    for i in range(5):
-        leaderboardEntry(i + 1, leaderboard[i][1], leaderboard[i][0], windowHeight/3 + 30*(i - 1))
-    
-    #Shows your position on the leaderboard
-    writeText("Your score:", windowWidth*0.5 - 55, windowHeight*0.6 - 30, True)
-    leaderboardEntry(playerRanking, playerName, playerScore, windowHeight*0.6)
 
 def endOfGame(outcome):
     #The game end window
