@@ -308,14 +308,12 @@ def displayOpponentHand():
     #If more then one digit is used to display the number
     if len(opponentHand) > 9:
         screen.blit(number, (windowWidth/2 - 38, cardHeight/2 - 25))
+    #If they only have one card left
+    elif len(opponentHand) == 1:
+        writeText('UNO!', windowWidth/2 - 44, cardHeight/2 - 10)
+    #If one digit is used and they ahev more than one card left
     else:
-        #If they only have one card left
-        if len(opponentHand) == 1:
-            writeText('UNO!', windowWidth/2 - 44, cardHeight/2 - 10)
-        
-        #If one digit is used and they ahev more than one card left
-        else:
-            screen.blit(number, (windowWidth/2 - 18, cardHeight/2 - 25))
+        screen.blit(number, (windowWidth/2 - 18, cardHeight/2 - 25))
 
 def opponentTurn():
     #The turn display is updated
