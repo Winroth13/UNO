@@ -315,6 +315,21 @@ def displayOpponentHand():
     else:
         screen.blit(number, (windowWidth/2 - 18, cardHeight/2 - 25))
 
+def isPlayerTurn(playerTurn):
+    global turnCounter
+    #If it's the player's turn
+    if playerTurn == True:
+        drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, cardColours['Green'])
+        writeText('Your turn', turnDisplayX - 80, turnDisplayY - 15)
+        
+        #Advances the turn by one
+        turnCounter += 1
+        
+    #If it's the oppoenent's turn
+    else:
+        drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, cardColours['Red'])
+        writeText("Opponent's turn", turnDisplayX - 135, turnDisplayY - 15)
+
 def opponentTurn():
     #The turn display is updated
     isPlayerTurn(False)
@@ -367,21 +382,6 @@ def opponentTurn():
     #Game continues
     else:
         isPlayerTurn(True)
-
-def isPlayerTurn(playerTurn):
-    global turnCounter
-    #If it's the player's turn
-    if playerTurn == True:
-        drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, cardColours['Green'])
-        writeText('Your turn', turnDisplayX - 80, turnDisplayY - 15)
-        
-        #Advances the turn by one
-        turnCounter += 1
-        
-    #If it's the oppoenent's turn
-    else:
-        drawFrame(turnDisplayX, turnDisplayY, turnDisplayWidth, turnDisplayHeight, cardColours['Red'])
-        writeText("Opponent's turn", turnDisplayX - 135, turnDisplayY - 15)
 
 def infoWindow(windowName):
     global currentWindow
