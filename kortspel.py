@@ -449,7 +449,7 @@ def endOfGame(outcome):
     if outcome == "Win":
         writeText("You won", windowWidth/2 - 70, windowHeight/12)
         
-        playerScore = turnCounter - len(opponentHand)
+        playerScore = turnCounter - len(opponentHand) - 3 #The -3 is for the three starting cards
         player = (playerScore, playerName)
         playerRanking = int(objectInserter(player, leaderboard, len(leaderboard), True) + 1)
         
