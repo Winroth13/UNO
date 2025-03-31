@@ -454,7 +454,7 @@ def endOfGame(outcome):
         playerRanking = int(objectInserter(player, leaderboard, len(leaderboard), True) + 1)
         
         #The new leaderboard is saved to the "leaderboard"-file
-        with open("leaderboard.txt", "wb") as filehandle:
+        with open("leaderboard.pkl", "wb") as filehandle:
             pickle.dump(leaderboard, filehandle)
     #Doesn't give you a score if you lose
     else:
@@ -656,7 +656,7 @@ def start():
     global leaderboard
     
     #The saved leaderboard is loaded in from the "leaderboard"-file
-    with open("leaderboard.txt", "rb") as filehandle:
+    with open("leaderboard.pkl", "rb") as filehandle:
         leaderboard = pickle.load(filehandle)
 
     #This can be used to check the leaderboard
